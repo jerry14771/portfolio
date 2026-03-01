@@ -10,7 +10,7 @@ function ScrollTech() {
         <div className="logo"><img src="/assets/css.png" height={80} alt="CSS" /></div>
         <div className="logo"><img src="/assets/phplogo.png" height={80} alt="PHP" /></div>
         <div className="logo"><img src="/assets/jsLogo.png" height={80} alt="JavaScript" /></div>
-        <div className="logo"><img src="/assets/laravel.png" height={80} width={200} alt="laravel" /></div>
+        <div className="logo"><img src="/assets/Laravel.png" height={80} width={200} alt="laravel" /></div>
         <div className="logo"><img src="/assets/reactLogo.png" height={80} alt="React Js" /></div>
         <div className="logo"><img src="/assets/nextLogo.png" height={80} alt="Next Js" /></div>
         <div className="logo"><img src="/assets/reactNative.svg" height={80} alt="React Native" /></div>
