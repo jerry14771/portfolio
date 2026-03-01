@@ -1,0 +1,29 @@
+.scroll-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.scroll-track {
+  display: flex;
+  align-items: center;
+  gap: 80px;              /* spacing between logos */
+  width: max-content;
+  /* animation: scroll 20s linear infinite; */
+  will-change: transform;
+  justify-content: space-evenly;
+}
+
+.logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  display: block;
+  height: 70px;
+  pointer-events: none;
+  user-select: none;
+}
+
