@@ -234,11 +234,35 @@ function ContactForm() {
   );
 }
 
+// ─── HAMBURGER ICON ──────────────────────────────────────────────
+function HamburgerIcon({ open }) {
+  const barStyle = (rotation, translateY, opacity = 1) => ({
+    display: "block",
+    width: 24,
+    height: 2,
+    backgroundColor: G,
+    borderRadius: 2,
+    transition: "all 0.3s ease",
+    transform: rotation,
+    opacity,
+    marginBottom: 5,
+  });
+
+  return (
+    <div style={{ width: 24, cursor: "pointer" }}>
+      <span style={barStyle(open ? "rotate(45deg) translate(5px, 5px)" : "none")} />
+      <span style={barStyle("none", "none", open ? 0 : 1)} />
+      <span style={barStyle(open ? "rotate(-45deg) translate(5px, -5px)" : "none")} />
+    </div>
+  );
+}
+
 // ─── MAIN APP ────────────────────────────────────────────────────
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -246,11 +270,21 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Close menu on nav link click
+  const handleNavClick = () => setMenuOpen(false);
+
   const bgStyle = {
     backgroundImage: 'url("/assets/green-space-7fwm57jdldylfq0b.jpg")',
     backgroundSize: 'cover',
     backgroundRepeat: 'repeat',
-    backgroundAttachment: 'fixed',   // parallax-like scroll
+    backgroundAttachment: 'fixed',
   };
 
   const navLinks = ["About", "Projects", "Experience", "Education", "Contact"];
@@ -261,50 +295,129 @@ function App() {
       {/* ── NAV ── */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
-        backgroundColor: scrolled ? "rgba(0,0,0,0.82)" : "transparent",
-        backdropFilter: scrolled ? "blur(10px)" : "none",
+        backgroundColor: scrolled || menuOpen ? "rgba(0,0,0,0.92)" : "transparent",
+        backdropFilter: scrolled || menuOpen ? "blur(10px)" : "none",
         borderBottom: scrolled ? `1px solid ${G_BORDER}` : "none",
         transition: "all 0.3s",
         padding: "0 20px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: 64,
       }}>
-        <img src="/assets/giphy.gif" alt="Logo" height={50} width={68} style={{ borderRadius: 5, padding: 4 }} />
+        {/* Top bar */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          height: 64,
+        }}>
+          <img src="/assets/giphy.gif" alt="Logo" height={50} width={68} style={{ borderRadius: 5, padding: 4 }} />
 
-        {/* Desktop nav */}
-        <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
-          {navLinks.map(l => (
+          {/* Desktop nav links */}
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+              {navLinks.map(l => (
+                <a
+                  key={l} href={`#${l.toLowerCase()}`}
+                  style={{ color: "#ccc", fontFamily: FONT, fontSize: 14, letterSpacing: 2, textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={e => e.target.style.color = G}
+                  onMouseLeave={e => e.target.style.color = "#ccc"}
+                >
+                  {l.toUpperCase()}
+                </a>
+              ))}
+            </div>
+          )}
+
+          {/* Desktop HIRE ME / Mobile hamburger */}
+          {!isMobile ? (
             <a
-              key={l} href={`#${l.toLowerCase()}`}
-              style={{ color: "#ccc", fontFamily: FONT, fontSize: 14, letterSpacing: 2, textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={e => e.target.style.color = G}
-              onMouseLeave={e => e.target.style.color = "#ccc"}
+              href="#contact"
+              style={{
+                backgroundColor: G, color: "#000", borderRadius: 10,
+                padding: "8px 20px", fontFamily: FONT, fontSize: 13,
+                fontWeight: "900", letterSpacing: 2, textDecoration: "none",
+              }}
             >
-              {l.toUpperCase()}
+              HIRE ME
             </a>
-          ))}
+          ) : (
+            <div onClick={() => setMenuOpen(o => !o)} style={{ padding: 8 }}>
+              <HamburgerIcon open={menuOpen} />
+            </div>
+          )}
         </div>
 
-        <a
-          href="#contact"
-          style={{
-            backgroundColor: G, color: "#000", borderRadius: 10,
-            padding: "8px 20px", fontFamily: FONT, fontSize: 13,
-            fontWeight: "900", letterSpacing: 2, textDecoration: "none",
-          }}
-        >
-          HIRE ME
-        </a>
+        {/* Mobile dropdown menu */}
+        {isMobile && (
+          <div style={{
+            maxHeight: menuOpen ? 400 : 0,
+            overflow: "hidden",
+            transition: "max-height 0.35s ease",
+          }}>
+            <div style={{
+              display: "flex", flexDirection: "column", gap: 0,
+              paddingBottom: menuOpen ? 16 : 0,
+              borderTop: menuOpen ? `1px solid ${G_BORDER}` : "none",
+            }}>
+              {navLinks.map(l => (
+                <a
+                  key={l}
+                  href={`#${l.toLowerCase()}`}
+                  onClick={handleNavClick}
+                  style={{
+                    color: "#ccc", fontFamily: FONT, fontSize: 15,
+                    letterSpacing: 3, textDecoration: "none",
+                    padding: "14px 4px",
+                    borderBottom: `1px solid rgba(20,233,88,0.1)`,
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={e => e.target.style.color = G}
+                  onMouseLeave={e => e.target.style.color = "#ccc"}
+                >
+                  {l.toUpperCase()}
+                </a>
+              ))}
+              <a
+                href="#contact"
+                onClick={handleNavClick}
+                style={{
+                  backgroundColor: G, color: "#000", borderRadius: 10,
+                  padding: "12px 20px", fontFamily: FONT, fontSize: 14,
+                  fontWeight: "900", letterSpacing: 2, textDecoration: "none",
+                  textAlign: "center", marginTop: 12,
+                }}
+              >
+                HIRE ME
+              </a>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── HERO ── */}
-      <section id="about" style={{ padding: "60px 20px 40px" }}>
-        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: "wrap", gap: 20 }}>
-          <div style={{ width: "42%", minWidth: 280 }}>
-            <img src='/assets/giphy2.gif' height={360} width={216} style={{ borderRadius: 12 }} />
-            <p style={{ ...pillStyle, fontSize: 20, marginTop: 16 }}>Hello, I'm Rohit Raj</p>
+      <section id="about" style={{ padding: isMobile ? "40px 20px 40px" : "60px 20px 40px" }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: isMobile ? "center" : "space-around",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "center" : "flex-start",
+          flexWrap: "wrap",
+          gap: isMobile ? 32 : 20,
+        }}>
+          {/* Left: Text content */}
+          <div style={{ width: isMobile ? "100%" : "42%", minWidth: isMobile ? "unset" : 280, textAlign: isMobile ? "center" : "left" }}>
+            <img
+              src='/assets/giphy2.gif'
+              height={isMobile ? 220 : 360}
+              width={isMobile ? 132 : 216}
+              style={{ borderRadius: 12 }}
+            />
+            <p style={{ ...pillStyle, fontSize: isMobile ? 16 : 20, marginTop: 16 }}>Hello, I'm Rohit Raj</p>
 
-            <div style={{ display: 'flex', flexWrap: "wrap", gap: 6, alignItems: "center", marginTop: 16 }}>
+            <div style={{
+              display: 'flex',
+              flexWrap: "wrap",
+              gap: 6,
+              alignItems: "center",
+              marginTop: 16,
+              justifyContent: isMobile ? "center" : "flex-start",
+            }}>
               {[
                 ["A", false],
                 ["Full-Stack Android", true],
@@ -316,14 +429,21 @@ function App() {
                 ["Grow", true],
                 ["Their Products", false],
               ].map(([word, accent], i) => (
-                <span key={i} style={{ fontSize: accent ? "2.5em" : "2em", fontFamily: FONT, color: accent ? G : "#fff" }}>
+                <span key={i} style={{
+                  fontSize: accent ? (isMobile ? "1.6em" : "2.5em") : (isMobile ? "1.3em" : "2em"),
+                  fontFamily: FONT,
+                  color: accent ? G : "#fff",
+                }}>
                   {word}
                 </span>
               ))}
             </div>
 
             {/* CTA buttons */}
-            <div style={{ display: "flex", gap: 14, marginTop: 28, flexWrap: "wrap" }}>
+            <div style={{
+              display: "flex", gap: 14, marginTop: 28, flexWrap: "wrap",
+              justifyContent: isMobile ? "center" : "flex-start",
+            }}>
               <a
                 href="#contact"
                 style={{
@@ -348,7 +468,10 @@ function App() {
             </div>
 
             {/* Quick stats */}
-            <div style={{ display: "flex", gap: 24, marginTop: 32, flexWrap: "wrap" }}>
+            <div style={{
+              display: "flex", gap: 24, marginTop: 32, flexWrap: "wrap",
+              justifyContent: isMobile ? "center" : "flex-start",
+            }}>
               {[["3+", "Years Exp."], ["15+", "Projects"], ["10k+", "Users Reached"]].map(([num, label]) => (
                 <div key={label} style={{ textAlign: "center" }}>
                   <p style={{ color: G, fontFamily: FONT, fontSize: 26, fontWeight: "900", margin: 0 }}>{num}</p>
@@ -358,20 +481,23 @@ function App() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img src="/assets/bg.png" height={580} width={580} style={{ borderRadius: 16 }} />
-          </div>
+          {/* Right: Profile image — hidden on mobile */}
+          {!isMobile && (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src="/assets/bg.png" height={580} width={580} style={{ borderRadius: 16 }} />
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── TECH STACK ── */}
       <section style={{ ...sectionStyle }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-          <p style={{ ...pillStyle, fontSize: 22 }}>Technology I Have Worked On</p>
+          <p style={{ ...pillStyle, fontSize: isMobile ? 16 : 22, textAlign: "center", letterSpacing: isMobile ? 2 : 5 }}>Technology I Have Worked On</p>
         </div>
         <div style={{ display: 'flex', justifyContent: "center", padding: "10px 0 20px" }}>
           <div style={{ width: "100%" }}>
-            <Marquee style={{ gap:"70px" }}>
+            <Marquee style={{ gap: "70px" }}>
               <ScrollTech />
             </Marquee>
           </div>
@@ -413,24 +539,6 @@ function App() {
           {education.map(e => <EduCard key={e.school} {...e} />)}
         </div>
       </section>
-
-      {/* ── TESTIMONIALS ── */}
-      {/* <section style={sectionStyle}>
-        <SectionHeading text="What Clients Say" />
-        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center", maxWidth: 1000, margin: "0 auto" }}>
-          {[
-            { name: "Aditya S.", role: "Startup Founder", text: "Rohit delivered our MVP in record time. Clean code, great communication, and beyond expectations." },
-            { name: "Priya M.", role: "Product Manager", text: "One of the best Android developers I've worked with. Really understands the product, not just the code." },
-            { name: "James K.", role: "CEO, US SaaS Co.", text: "Hired Rohit for a Next.js rebuild — the result was stunning. Will definitely work again." },
-          ].map(t => (
-            <div key={t.name} style={{ ...cardStyle, flex: "1 1 260px", maxWidth: 300 }}>
-              <p style={{ color: "#ccc", fontFamily: FONT, fontSize: 14, lineHeight: 1.8, marginBottom: 16, fontStyle: "italic" }}>"{t.text}"</p>
-              <p style={{ color: G, fontFamily: FONT, fontWeight: "900", margin: 0 }}>{t.name}</p>
-              <p style={{ color: "#666", fontFamily: FONT, fontSize: 12, margin: "2px 0 0" }}>{t.role}</p>
-            </div>
-          ))}
-        </div>
-      </section> */}
 
       {/* ── CONTACT ── */}
       <section id="contact" style={sectionStyle}>
